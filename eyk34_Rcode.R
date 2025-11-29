@@ -107,4 +107,26 @@ ci_upper
 
               #----- section 5--------
 
+#define high tempo songs (above median tempo)
+median_tempo <- median(spotify$tempo, na.rm = TRUE)
+fast_songs <- spotify$energy[spotify$tempo > median_tempo]
+
+#population mean energy
+pop_mean_energy <- mean(spotify$energy, na.rm = TRUE)
+pop_sd_energy   <- sd(spotify$energy, na.rm = TRUE)
+
+#sample statistics for fast songs
+xbar <- mean(fast_songs, na.rm = TRUE)
+n <- length(fast_songs)
+
+#z-test
+z_value <- (xbar - pop_mean_energy) / (pop_sd_energy / sqrt(n))
+
+#one-sided p-value (testing if fast songs have higher energy)
+p_value <- 1 - pnorm(z_value)
+
+z_value
+p_value
+
+
 
