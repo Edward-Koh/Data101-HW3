@@ -57,3 +57,54 @@ breaks <- seq(0, 100, by = 5)
 table(cut(spotify$popularity, breaks, include.lowest = TRUE, right = TRUE))
 table(spotify$explicit)
 
+              #------ section 3 ------
+set.seed(123)
+
+n_rows <- nrow(spotify)
+
+subset_rows <- sample(1:n_rows, 10000, replace = FALSE)
+spotify_subset <- spotify[subset_rows, ]
+
+cor_original <- cor(spotify_subset$key, spotify_subset$tempo)
+cor_original
+
+n_perm <- 1000
+cor_perm <- numeric(n_perm)
+
+for (i in 1:n_perm) {
+  shuffled_key <- sample(spotify_subset$key)
+  cor_perm[i] <- cor(spotify_subset$tempo, shuffled_key)
+}
+
+# Two-tailed p-value
+p_value <- mean(abs(cor_perm) >= abs(cor_original))
+p_value
+
+              # ------- section 4------
+
+n_samples <- 1000
+sample_size <- 50
+
+#take random samples of popularity and compute means
+sample_means <- replicate(n_samples, {
+  mean(sample(spotify$popularity, sample_size, replace = TRUE))
+})
+
+#plot distribution
+hist(sample_means, breaks = 30, col = "lightblue",
+     main = "Distribution of Sample Means (Popularity)",
+     xlab = "Sample Mean Popularity"
+    )
+
+#compute 95% confidence interval
+mean_pop <- mean(sample_means)
+se <- sd(sample_means)
+ci_lower <- mean_pop - 1.96 * se
+ci_upper <- mean_pop + 1.96 * se
+
+ci_lower
+ci_upper
+
+              #----- section 5--------
+
+
