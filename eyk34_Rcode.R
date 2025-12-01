@@ -178,4 +178,27 @@ for(pair in pairs){
   }
 }
 
+              #------ Section 8--------
 
+spotify$high_popularity <- spotify$popularity > 75
+spotify$high_danceability <- spotify$danceability > 0.75
+
+prior_prob <- sum(spotify$high_popularity) / nrow(spotify)
+prior_odds <- prior_prob / (1 - prior_prob)
+
+#Likelihood ratio
+P_E_given_Popular <- sum(spotify$high_danceability & spotify$high_popularity) / sum(spotify$high_popularity)
+P_E_given_NotPopular <- sum(spotify$high_danceability & !spotify$high_popularity) / sum(!spotify$high_popularity)
+likelihood_ratio <- P_E_given_Popular / P_E_given_NotPopular
+
+#Posterior odds
+posterior_odds <- prior_odds * likelihood_ratio
+
+#Posterior probability (optional)
+posterior_prob <- posterior_odds / (1 + posterior_odds)
+
+#print
+cat("Prior odds =", round(prior_odds,3), 
+    " Likelihood ratio =", round(likelihood_ratio,3),
+    " Posterior odds =", round(posterior_odds,3),
+    " Posterior probability =", round(posterior_prob,3), "\n")
