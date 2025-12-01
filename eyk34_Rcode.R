@@ -259,7 +259,6 @@ spotify_trans <- as(spotify_rules, "transactions")
 # Run Apriori algorithm to find rules with lift > 1
 rules <- apriori(spotify_trans,
                  parameter = list(supp=0.001, conf=0.1))
-rules
 
 #filter rules with lift > 1
 strong_rules <- subset(rules, lift > 1)
