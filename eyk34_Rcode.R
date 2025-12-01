@@ -1,5 +1,15 @@
-
-                #----Section 1------
+#Library
+#install.packages("devtools")
+library(devtools)
+#devtools::install_github("janish-parikh/ZTest")
+library(HypothesisTesting)
+library(rpart)
+#install.packages("rpart.plot")
+library(rpart.plot)
+#install.packages("arules")
+library(arules)
+                
+#----Section 1------
 #load the spotify dataset
 
 spotify <- read.csv("dataset.csv")
@@ -139,8 +149,6 @@ chi_result <- chisq.test(genre_explicit_table)
 chi_result
 
         #------ section 7 ------
-library(devtools)
-library(HypothesisTesting)
 
 means_genre <- tapply(spotify$popularity, spotify$track_genre, mean)
 means_genre
@@ -202,3 +210,32 @@ cat("Prior odds =", round(prior_odds,3),
     " Likelihood ratio =", round(likelihood_ratio,3),
     " Posterior odds =", round(posterior_odds,3),
     " Posterior probability =", round(posterior_prob,3), "\n")
+
+
+          #------ section 9----------
+
+spotify_model <- spotify[, c("danceability", "energy", "valence", "acousticness", "tempo", "popularity")]
+spotify_model$popular_label <- ifelse(spotify_model$popularity > 80, 1, 0)
+
+# Split into training (80%) and testing (20%)
+set.seed(123)
+train_index <- sample(1:nrow(spotify_model), 0.80 * nrow(spotify_model))
+train <- spotify_model[train_index, ]
+test <- spotify_model[-train_index, ]
+
+# Fit decision tree with adjusted control parameters
+tree_model <- rpart(popular_label ~ danceability + energy + valence + acousticness + tempo,
+                    data = train,
+                    method = "class",
+                    control = rpart.control(minsplit = 15, cp = 0.001))
+
+# Plot the tree
+rpart.plot(tree_model, main="Decision Tree for Predicting Popularity")
+
+# Make predictions on test set
+pred <- predict(tree_model, test, type="class")
+
+# Calculate accuracy
+accuracy <- mean(pred == test$popular_label)
+cat("Decision tree accuracy on test set:", round(accuracy,3), "\n")
+
