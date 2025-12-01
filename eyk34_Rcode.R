@@ -12,7 +12,7 @@ library(arules)
 #----Section 1------
 #load the spotify dataset
 
-spotify <- read.csv("dataset.csv")
+spotify <- read.csv("https://raw.githubusercontent.com/Edward-Koh/Data101-HW3/refs/heads/main/dataset.csv")
 
 head(spotify)
 
@@ -267,4 +267,3 @@ strong_rules
 strong_rules <- sort(strong_rules, by="lift", decreasing = TRUE)
 
 inspect(head(strong_rules, 5))
-
