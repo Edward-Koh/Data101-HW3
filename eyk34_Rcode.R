@@ -128,5 +128,54 @@ p_value <- 1 - pnorm(z_value)
 z_value
 p_value
 
+        #------ section 6-------
+
+#freq table of genre and explicity
+genre_explicit_table <- table(spotify$track_genre, spotify$explicit)
+genre_explicit_table
+
+#chi test
+chi_result <- chisq.test(genre_explicit_table)
+chi_result
+
+        #------ section 7 ------
+library(devtools)
+library(HypothesisTesting)
+
+means_genre <- tapply(spotify$popularity, spotify$track_genre, mean)
+means_genre
+
+N <- sum(!is.na(means_genre))
+
+# of pairwise comparison
+M <- N * (N - 1) / 2
+
+# Adjusted significance level
+genre_sig <- 0.05 / M
+
+cat("Number of genres =", N, "\n")
+cat("Number of comparisons =", M, "\n")
+cat("Bonferroni-adjusted alpha =", genre_sig, "\n")
+
+pairs <- list(
+  c('pop','rock'),
+  c('hip-hop','jazz'),
+  c('classical','electronic'),
+  c('country','r-n-b'),
+  c('metal','reggae')
+)
+
+for(pair in pairs){
+  # permutation_test returns numeric p-value directly
+  pval <- permutation_test(spotify, 'track_genre', 'popularity', 1000, pair[1], pair[2])
+  
+  cat(pair[1], "vs", pair[2], "→ p-value:", pval, " ")
+  
+  if(pval < genre_sig){
+    cat(": Significant\n")
+  } else {
+    cat(": Not significant\n")
+  }
+}
 
 
