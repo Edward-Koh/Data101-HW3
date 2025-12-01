@@ -267,3 +267,4 @@ strong_rules
 strong_rules <- sort(strong_rules, by="lift", decreasing = TRUE)
 
 inspect(head(strong_rules, 5))
+
