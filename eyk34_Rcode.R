@@ -239,3 +239,32 @@ pred <- predict(tree_model, test, type="class")
 accuracy <- mean(pred == test$popular_label)
 cat("Decision tree accuracy on test set:", round(accuracy,3), "\n")
 
+          #------section 10------
+
+spotify_rules <- spotify[, c("danceability", "energy", "valence", "acousticness", "tempo")]
+
+# Convert numeric to categorical (Low, Medium, High) using quantiles
+for(col in colnames(spotify_rules)){
+  spotify_rules[[col]] <- cut(spotify_rules[[col]], 
+                              breaks = quantile(spotify_rules[[col]], probs = seq(0,1,0.3333), na.rm=TRUE),
+                              include.lowest = TRUE,
+                              labels = c("Low","Medium","High"))
+}
+summary(spotify_rules)
+
+# Convert to transactions
+spotify_trans <- as(spotify_rules, "transactions")
+
+
+# Run Apriori algorithm to find rules with lift > 1
+rules <- apriori(spotify_trans,
+                 parameter = list(supp=0.001, conf=0.1))
+rules
+
+#filter rules with lift > 1
+strong_rules <- subset(rules, lift > 1)
+strong_rules
+#sort by lift
+strong_rules <- sort(strong_rules, by="lift", decreasing = TRUE)
+
+inspect(head(strong_rules, 5))
